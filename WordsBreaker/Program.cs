@@ -12,28 +12,22 @@ namespace WordsBreaker
     {
         static void Main(string[] args)
         {
-
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Content/dict");
-            if (!File.Exists(filePath))
-            {
-                Console.WriteLine($"Dictionary file not found in folder: {filePath}\r\nPress any key to exit");
-                Console.ReadKey();
-                return;
-            }
-            var lookup = File.ReadAllLines(filePath)
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .Select(s => s.ToLower())
-                .Distinct()
-                .ToDictionary(
-                    keySelector: word => word,
-                    elementSelector: word => word
-                );
+            ILookupInitializer lookupInitializer = GetLookupInitializer();
+            var lookup = lookupInitializer.InitializeLookupFromFile("Content/dict1")
+                                          .ToDictionary(
+                                           keySelector: word => word,
+                                           elementSelector: word => word);
 
             var wordBraker = new WordsBreaker("Content/de-test-words.tsv", lookup.Min(word => word.Value.Length));
             wordBraker.FindWordConcatenationInLookup(lookup);
             wordBraker.PrintResult();
             Console.ReadKey();
 
+        }
+
+        public static ILookupInitializer GetLookupInitializer()
+        {
+            return new LookupInitializer();
         }
     }
 }
