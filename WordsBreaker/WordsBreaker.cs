@@ -8,12 +8,19 @@ using GenericParsing;
 
 namespace WordsBreaker
 {
-    public class WordsBreaker
+    public interface IWordsBreaker
+    {
+        void FindWordConcatenationInLookup(Dictionary<string, string> lookup);
+        void FindWord(string word, Dictionary<string, string> lookup);
+        Dictionary<string, HashSet<string>> Result { get; }
+    }
+    public class WordsBreaker: IWordsBreaker
     {
         private readonly int _minWordLength;
-        private Dictionary<string, string> _lookup;
         private Dictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
         private GenericParser _parser;
+
+        public Dictionary<string, HashSet<string>> Result => result;
 
         public WordsBreaker(string testFilePath, int minWordLength)
         {
@@ -35,18 +42,17 @@ namespace WordsBreaker
         }
         public void FindWordConcatenationInLookup(Dictionary<string, string> lookup)
         {
-            _lookup = lookup;
             using (_parser)
             {
                 while (_parser.Read())
                 {
                     string word = _parser[1];
-                    FindWord(word);
+                    FindWord(word, lookup);
                 }
             }
         }
 
-        private void FindWord(string word)
+        public void FindWord(string word, Dictionary<string, string> lookup)
         {
             result[word] = new HashSet<string>();
             int currentWordLength = word.Length;
@@ -59,7 +65,7 @@ namespace WordsBreaker
                 if (suffix.Length < _minWordLength)
                     break;
 
-                if (_lookup.ContainsKey(prefix) && _lookup.ContainsKey(suffix))
+                if (lookup.ContainsKey(prefix) && lookup.ContainsKey(suffix))
                 {
                     //If word = prefix + sufix it's contactenated word we are looking for
                     result[word].Add(prefix);
