@@ -12,7 +12,7 @@ namespace WordsBreaker
     {
         static void Main(string[] args)
         {
-            
+
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Content/dict");
             if (!File.Exists(filePath))
             {
@@ -20,20 +20,17 @@ namespace WordsBreaker
                 Console.ReadKey();
                 return;
             }
-            var wordsComparer = new WordsComparer();
-            var tempLookup = File.ReadAllLines(filePath)
+            var lookup = File.ReadAllLines(filePath)
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(s => s.ToLower())
                 .Distinct()
-                .ToList();
-            var r = new HashSet<string>(tempLookup);
-            
+                .ToDictionary(
+                    keySelector: word => word,
+                    elementSelector: word => word
+                );
 
-            var wordBraker = new WordsBreaker("Content/de-test-words.tsv", tempLookup.Min(word=>word.Length));
-            wordBraker.FindWordConcatenationInLookup(r.ToDictionary(
-                keySelector: word => word,
-                elementSelector: word => word
-                ));
+            var wordBraker = new WordsBreaker("Content/de-test-words.tsv", lookup.Min(word => word.Value.Length));
+            wordBraker.FindWordConcatenationInLookup(lookup);
             wordBraker.PrintResult();
             Console.ReadKey();
 

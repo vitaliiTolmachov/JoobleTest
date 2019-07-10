@@ -18,6 +18,12 @@ namespace WordsBreaker
         public WordsBreaker(string testFilePath, int minWordLength)
         {
             _minWordLength = minWordLength;
+            if (!File.Exists(testFilePath))
+            {
+                Console.WriteLine($"Test words file not found in folder: {testFilePath}\r\nPress any key to exit");
+                Console.ReadKey();
+                return;
+            }
             _parser = new GenericParser(testFilePath, Encoding.UTF8)
             {
                 SkipEmptyRows = true,
@@ -35,12 +41,12 @@ namespace WordsBreaker
                 while (_parser.Read())
                 {
                     string word = _parser[1];
-                    FindWord(word,_parser.FileRowNumber);
+                    FindWord(word);
                 }
             }
         }
 
-        private void FindWord(string word, int index)
+        private void FindWord(string word)
         {
             result[word] = new HashSet<string>();
             int currentWordLength = word.Length;
@@ -63,7 +69,7 @@ namespace WordsBreaker
                         break;
                     }
                     //Let's find another part to concatenate with prefix
-                    FindWord(suffix, index);
+                    FindWord(suffix);
                 }
             }
         }
