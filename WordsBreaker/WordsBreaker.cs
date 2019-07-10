@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GenericParsing;
 
 namespace WordsBreaker
 {
@@ -10,21 +12,31 @@ namespace WordsBreaker
     {
         private readonly int _minWordLength;
         private Dictionary<string, string> _lookup;
-        private List<string> _testwords;
         private Dictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+        private GenericParser _parser;
 
-        public WordsBreaker(int minWordLength)
+        public WordsBreaker(string testFilePath, int minWordLength)
         {
             _minWordLength = minWordLength;
-        }
-        public void FindWordConcatenationInLookup(List<string> testWords, Dictionary<string, string> lookup)
-        {
-            _testwords = testWords;
-            _lookup = lookup;
-
-            for (int i = 0; i < testWords.Count; i++)
+            _parser = new GenericParser(testFilePath, Encoding.UTF8)
             {
-                FindWord(testWords[i], i);
+                SkipEmptyRows = true,
+                StripControlChars = true,
+                FirstRowHasHeader = true,
+                TextFieldType = FieldType.Delimited,
+                ColumnDelimiter = '\t'
+            };
+        }
+        public void FindWordConcatenationInLookup(Dictionary<string, string> lookup)
+        {
+            _lookup = lookup;
+            using (_parser)
+            {
+                while (_parser.Read())
+                {
+                    string word = _parser[1];
+                    FindWord(word,_parser.FileRowNumber);
+                }
             }
         }
 
