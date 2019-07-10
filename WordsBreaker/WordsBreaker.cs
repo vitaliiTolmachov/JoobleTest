@@ -59,17 +59,12 @@ namespace WordsBreaker
                 if (suffix.Length < _minWordLength)
                     break;
 
-                if (_lookup.ContainsKey(prefix))
+                if (_lookup.ContainsKey(prefix) && _lookup.ContainsKey(suffix))
                 {
-                    if (_lookup.ContainsKey(suffix))
-                    {
-                        //If word = prefix + sufix it's contactenated word we are looking for
-                        result[word].Add(prefix);
-                        result[word].Add(suffix);
-                        break;
-                    }
-                    //Let's find another part to concatenate with prefix
-                    FindWord(suffix);
+                    //If word = prefix + sufix it's contactenated word we are looking for
+                    result[word].Add(prefix);
+                    result[word].Add(suffix);
+                    break;
                 }
             }
         }
