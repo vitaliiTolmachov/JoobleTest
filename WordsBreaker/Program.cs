@@ -13,7 +13,7 @@ namespace WordsBreaker
         static void Main(string[] args)
         {
             ILookupInitializer lookupInitializer = GetLookupInitializer();
-            var lookup = lookupInitializer.InitializeLookupFromFile("Content/dict1")
+            var lookup = lookupInitializer.InitializeLookupFromFile("Content/dict")
                                           .ToDictionary(
                                            keySelector: word => word,
                                            elementSelector: word => word);
